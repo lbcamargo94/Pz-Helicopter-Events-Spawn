@@ -1,17 +1,17 @@
 -- ============================================================
 --  CooldownBar.lua -- Pz-Helicopter-Events-Spawn
 --  Barra de cooldown persistente no canto inferior direito
---  Depende de HET_State definido em Main.lua
+--  Depende de HES_State definido em Main.lua
 -- ============================================================
 
-HET_CooldownBar = ISPanel:derive("HET_CooldownBar")
+HES_CooldownBar = ISPanel:derive("HES_CooldownBar")
 
 local BAR_W   = 220
 local BAR_H   = 54
 local MARGIN  = 14
 local PAD     = 10
 
-function HET_CooldownBar:new()
+function HES_CooldownBar:new()
     local sw = getCore():getScreenWidth()
     local sh = getCore():getScreenHeight()
     local x  = sw - BAR_W - MARGIN
@@ -23,7 +23,7 @@ function HET_CooldownBar:new()
     return o
 end
 
-function HET_CooldownBar:render()
+function HES_CooldownBar:render()
     -- respeita opcao de visibilidade
     if not PZAPI or not PZAPI.ModOptions then return end
     local options = PZAPI.ModOptions:getOptions("Pz-Helicopter-Events-Spawn")
@@ -31,7 +31,7 @@ function HET_CooldownBar:render()
     local showOpt = options:getOption("showCooldownBar")
     if showOpt and not showOpt:getValue() then return end
 
-    if not HET_State then return end
+    if not HES_State then return end
 
     local now       = getTimeInMillis()
     local cooldownMs = 0
@@ -40,7 +40,7 @@ function HET_CooldownBar:render()
         cooldownMs = (cdOpt:getValue() or 60) * 1000
     end
 
-    local elapsed  = now - (HET_State.lastActivation or 0)
+    local elapsed  = now - (HES_State.lastActivation or 0)
     local onCooldown = cooldownMs > 0 and elapsed < cooldownMs
     local progress   = 1.0
     if onCooldown then
@@ -55,7 +55,7 @@ function HET_CooldownBar:render()
     self:drawRectBorder(0, 0, w, h, 0.85, 0.35, 0.35, 0.35)
 
     -- label
-    local label = getText("HET_BarLabel")
+    local label = getText("HES_BarLabel")
     local labelFont = UIFont.Small
     local labelW = getTextManager():MeasureStringX(labelFont, label)
     local labelX = math.floor((w - labelW) / 2)
@@ -84,14 +84,13 @@ function HET_CooldownBar:render()
         local remaining = math.ceil((cooldownMs - elapsed) / 1000)
         statusText = tostring(remaining) .. "s"
     else
-        statusText = getText("HET_BarReady")
+        statusText = getText("HES_BarReady")
     end
 
     -- contador de sessao
-    local count = HET_State.sessionCount or 0
+    local count = HES_State.sessionCount or 0
     local countText = "#" .. tostring(count)
 
-    local statusW  = getTextManager():MeasureStringX(statusFont, statusText)
     local countW   = getTextManager():MeasureStringX(statusFont, countText)
     local textY    = barY + barH + 4
 
@@ -107,12 +106,10 @@ local _barPanel = nil
 
 local function createBar()
     if _barPanel then return end
-    if not getPlayer() then return end
-    _barPanel = HET_CooldownBar:new()
+    _barPanel = HES_CooldownBar:new()
     _barPanel:initialise()
     _barPanel:addToUIManager()
     _barPanel:setAlwaysOnTop(true)
 end
 
 Events.OnGameStart.Add(createBar)
-Events.OnLoad.Add(createBar)

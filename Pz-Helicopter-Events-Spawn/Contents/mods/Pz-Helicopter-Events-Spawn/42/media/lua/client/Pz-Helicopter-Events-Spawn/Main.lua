@@ -10,12 +10,12 @@ require "Pz-Helicopter-Events-Spawn/Options"
 --  Estado global (acessivel por CooldownBar.lua)
 -- ============================================================
 
-HET_State = HET_State or {}
-HET_State.lastActivation = HET_State.lastActivation or 0
-HET_State.eventEndAt     = HET_State.eventEndAt     or 0
-HET_State.sessionCount   = HET_State.sessionCount   or 0
-HET_State.pendingConfirm = false
-HET_State.pendingTime    = 0
+HES_State = HES_State or {}
+HES_State.lastActivation = HES_State.lastActivation or 0
+HES_State.eventEndAt     = HES_State.eventEndAt     or 0
+HES_State.sessionCount   = HES_State.sessionCount   or 0
+HES_State.pendingConfirm = false
+HES_State.pendingTime    = 0
 
 local CONFIRM_WINDOW = 5000
 
@@ -33,7 +33,7 @@ end
 
 local function dbg(msg)
     if getOpt("debugLogs") then
-        print("[HET] " .. tostring(msg))
+        print("[HES] " .. tostring(msg))
     end
 end
 
@@ -41,9 +41,9 @@ end
 --  Painel de mensagem HUD (flutuante, auto-desaparece)
 -- ============================================================
 
-HET_MsgPanel = ISPanel:derive("HET_MsgPanel")
+HES_MsgPanel = ISPanel:derive("HES_MsgPanel")
 
-function HET_MsgPanel:new(lines, isWarning)
+function HES_MsgPanel:new(lines, isWarning)
     local sw  = getCore():getScreenWidth()
     local sh  = getCore():getScreenHeight()
     local lh  = 24
@@ -65,7 +65,7 @@ function HET_MsgPanel:new(lines, isWarning)
     return o
 end
 
-function HET_MsgPanel:render()
+function HES_MsgPanel:render()
     local elapsed = getTimeInMillis() - self.startTime
     if elapsed >= self.duration then
         self:removeFromUIManager()
@@ -98,7 +98,7 @@ end
 
 local function showHUDMsg(lines, isWarning)
     if not getOpt("showMessage") then return end
-    local panel = HET_MsgPanel:new(lines, isWarning)
+    local panel = HES_MsgPanel:new(lines, isWarning)
     panel:initialise()
     panel:addToUIManager()
 end
@@ -110,15 +110,15 @@ end
 local function loadHistory(player)
     local md = player:getModData()
     return {
-        total   = md.HET_Total   or 0,
-        lastDay = md.HET_LastDay or 0,
+        total   = md.HES_Total   or 0,
+        lastDay = md.HES_LastDay or 0,
     }
 end
 
 local function saveHistory(player, total, lastDay)
     local md = player:getModData()
-    md.HET_Total   = total
-    md.HET_LastDay = lastDay
+    md.HES_Total   = total
+    md.HES_LastDay = lastDay
 end
 
 -- ============================================================
@@ -126,19 +126,19 @@ end
 -- ============================================================
 
 local function doEndEvent(fromManual)
-    HET_State.eventEndAt = 0
+    HES_State.eventEndAt = 0
     pcall(endHelicopter)
     if fromManual then
         dbg("evento encerrado manualmente")
     else
         dbg("evento encerrado apos duracao configurada")
     end
-    showHUDMsg({ getText("HET_MsgEventEnded") }, true)
+    showHUDMsg({ getText("HES_MsgEventEnded") }, true)
 end
 
 Events.OnTick.Add(function()
-    if HET_State.eventEndAt == 0 then return end
-    if getTimeInMillis() < HET_State.eventEndAt then return end
+    if HES_State.eventEndAt == 0 then return end
+    if getTimeInMillis() < HES_State.eventEndAt then return end
     doEndEvent(false)
 end)
 
@@ -160,9 +160,9 @@ local function doTrigger()
     -- sandbox
     if getOpt("respectSandbox") then
         local sv = SandboxVars
-        if sv and sv.HelicopterEvents ~= nil and sv.HelicopterEvents == 0 then
+        if sv and sv.Helicopter ~= nil and sv.Helicopter == 1 then
             dbg("bloqueado pelo sandbox")
-            showHUDMsg({ getText("HET_MsgSandboxBlocked") }, true)
+            showHUDMsg({ getText("HES_MsgSandboxBlocked") }, true)
             return
         end
     end
@@ -174,7 +174,7 @@ local function doTrigger()
         if currentDay < minDays then
             local unlockDay = minDays
             dbg("bloqueado por dia: dia atual " .. currentDay .. " < minDays " .. minDays)
-            showHUDMsg({ getText("HET_MsgDayBlocked", tostring(unlockDay)) }, true)
+            showHUDMsg({ getText("HES_MsgDayBlocked", tostring(unlockDay)) }, true)
             return
         end
     end
@@ -182,17 +182,17 @@ local function doTrigger()
     -- restricao de veiculo
     if not getOpt("allowInVehicle") and player:getVehicle() ~= nil then
         dbg("dentro de veiculo, bloqueado")
-        showHUDMsg({ getText("HET_MsgVehicle") }, true)
+        showHUDMsg({ getText("HES_MsgVehicle") }, true)
         return
     end
 
     -- cooldown
     local now        = getTimeInMillis()
     local cooldownMs = (getOpt("cooldownSecs") or 60) * 1000
-    if cooldownMs > 0 and (now - HET_State.lastActivation) < cooldownMs then
-        local remaining = math.ceil((cooldownMs - (now - HET_State.lastActivation)) / 1000)
+    if cooldownMs > 0 and (now - HES_State.lastActivation) < cooldownMs then
+        local remaining = math.ceil((cooldownMs - (now - HES_State.lastActivation)) / 1000)
         dbg("cooldown ativo: " .. remaining .. "s")
-        showHUDMsg({ getText("HET_MsgCooldown", tostring(remaining)) }, true)
+        showHUDMsg({ getText("HES_MsgCooldown", tostring(remaining)) }, true)
         return
     end
 
@@ -201,7 +201,7 @@ local function doTrigger()
     if chance < 100 then
         if math.random(1, 100) > chance then
             dbg("chance falhou (" .. chance .. "%)")
-            showHUDMsg({ getText("HET_MsgChanceFail") }, true)
+            showHUDMsg({ getText("HES_MsgChanceFail") }, true)
             return
         end
     end
@@ -219,16 +219,16 @@ local function doTrigger()
     end
 
     -- atualiza estado
-    HET_State.lastActivation = now
-    HET_State.sessionCount   = HET_State.sessionCount + 1
+    HES_State.lastActivation = now
+    HES_State.sessionCount   = HES_State.sessionCount + 1
 
     -- agenda encerramento automatico
     local minSecs = getOpt("minEventSecs") or 0
     if minSecs > 0 then
-        HET_State.eventEndAt = now + minSecs * 1000
+        HES_State.eventEndAt = now + minSecs * 1000
         dbg("encerramento agendado em " .. minSecs .. "s")
     else
-        HET_State.eventEndAt = 0
+        HES_State.eventEndAt = 0
     end
 
     -- historico persistente
@@ -243,17 +243,17 @@ local function doTrigger()
 
     -- notificacoes
     showHUDMsg({
-        getText("HET_MsgActivated"),
-        getText("HET_MsgRegion"),
-        getText("HET_MsgPrepare"),
-        getText("HET_MsgActivationCount", tostring(HET_State.sessionCount)),
+        getText("HES_MsgActivated"),
+        getText("HES_MsgRegion"),
+        getText("HES_MsgPrepare"),
+        getText("HES_MsgActivationCount", tostring(HES_State.sessionCount)),
     })
 
     if getOpt("playSound") then
         pcall(function() getSoundManager():playUISound("UIActivateButton") end)
     end
 
-    dbg("evento ativado (sessao: " .. HET_State.sessionCount .. ")")
+    dbg("evento ativado (sessao: " .. HES_State.sessionCount .. ")")
 end
 
 -- ============================================================
@@ -291,26 +291,26 @@ Events.OnKeyPressed.Add(function(key)
     local now = getTimeInMillis()
 
     if getOpt("requireConfirm") then
-        if HET_State.pendingConfirm and (now - HET_State.pendingTime) < CONFIRM_WINDOW then
-            HET_State.pendingConfirm = false
+        if HES_State.pendingConfirm and (now - HES_State.pendingTime) < CONFIRM_WINDOW then
+            HES_State.pendingConfirm = false
             dbg("confirmacao recebida")
             doTrigger()
         else
-            HET_State.pendingConfirm = true
-            HET_State.pendingTime    = now
+            HES_State.pendingConfirm = true
+            HES_State.pendingTime    = now
             dbg("aguardando confirmacao")
             if getOpt("showMessage") then
                 local keyName = getKeyName(activKeyOpt:getValue())
-                local panel = HET_MsgPanel:new({
-                    getText("HET_MsgConfirmTitle"),
-                    getText("HET_MsgConfirmBody", keyName),
+                local panel = HES_MsgPanel:new({
+                    getText("HES_MsgConfirmTitle"),
+                    getText("HES_MsgConfirmBody", keyName),
                 }, true)
                 panel:initialise()
                 panel:addToUIManager()
             end
         end
     else
-        HET_State.pendingConfirm = false
+        HES_State.pendingConfirm = false
         doTrigger()
     end
 end)
