@@ -16,6 +16,11 @@ HES_State.eventEndAt     = HES_State.eventEndAt     or 0
 HES_State.sessionCount   = HES_State.sessionCount   or 0
 HES_State.pendingConfirm = false
 HES_State.pendingTime    = 0
+-- Fire system state (reset on every load)
+HES_State.fireActive      = false
+HES_State.fireEndAt       = 0
+HES_State.lastFireBurst   = 0
+HES_State.fireFirstBurst  = false
 
 local CONFIRM_WINDOW = 5000
 
@@ -122,11 +127,81 @@ local function saveHistory(player, total, lastDay)
 end
 
 -- ============================================================
+--  Rajada de fogo do helicoptero
+-- ============================================================
+
+local function doFireBurst()
+    local player = getPlayer()
+    if not player or player:isDead() then return end
+
+    -- Dano no jogador (apenas ao ar livre - helicoptero nao mira quem esta coberto)
+    if getOpt("fireHitsPlayer") then
+        local outdoor = true
+        pcall(function() outdoor = player:isOutside() end)
+        if outdoor then
+            local dmgPct = (getOpt("fireDamage") or 5) / 100.0
+            local newHp  = math.max(0.01, player:getHealth() - dmgPct)
+            player:setHealth(newHp)
+            dbg("fogo atingiu jogador: saude = " .. string.format("%.2f", newHp))
+        else
+            dbg("jogador em abrigo, dano ignorado")
+        end
+    end
+
+    -- Mata zumbis proximos aleatoriamente
+    if getOpt("fireHitsZombies") then
+        local px = math.floor(player:getX())
+        local py = math.floor(player:getY())
+        local pz = math.floor(player:getZ())
+        local radius = 15
+        local killed = 0
+        for ox = -radius, radius do
+            for oy = -radius, radius do
+                if math.random(1, 100) <= 40 then
+                    local sq = nil
+                    pcall(function() sq = getCell():getGridSquare(px + ox, py + oy, pz) end)
+                    if sq then
+                        local movables = sq:getMovingObjects()
+                        if movables then
+                            for i = movables:size(), 1, -1 do
+                                local obj = nil
+                                pcall(function() obj = movables:get(i - 1) end)
+                                if obj and instanceof(obj, "IsoZombie") then
+                                    pcall(function()
+                                        obj:removeFromWorld()
+                                        obj:removeFromSquare()
+                                    end)
+                                    killed = killed + 1
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+        dbg("fogo eliminou " .. killed .. " zumbi(s)")
+    end
+
+    -- Ruido de tiro para atrair mais zumbis
+    pcall(function()
+        addSound(player, player:getX(), player:getY(), player:getZ(), 40, 1)
+    end)
+
+    -- Notificacao HUD apenas na primeira rajada
+    if HES_State.fireFirstBurst then
+        HES_State.fireFirstBurst = false
+        showHUDMsg({ HES_getText("HES_MsgFireHit") }, true)
+    end
+end
+
+-- ============================================================
 --  Encerramento do evento (automatico ou manual)
 -- ============================================================
 
 local function doEndEvent(fromManual)
-    HES_State.eventEndAt = 0
+    HES_State.eventEndAt  = 0
+    HES_State.fireActive  = false
+    HES_State.fireEndAt   = 0
     pcall(endHelicopter)
     if fromManual then
         dbg("evento encerrado manualmente")
@@ -137,9 +212,25 @@ local function doEndEvent(fromManual)
 end
 
 Events.OnTick.Add(function()
-    if HES_State.eventEndAt == 0 then return end
-    if getTimeInMillis() < HES_State.eventEndAt then return end
-    doEndEvent(false)
+    local now = getTimeInMillis()
+
+    -- Encerramento automatico do evento
+    if HES_State.eventEndAt ~= 0 and now >= HES_State.eventEndAt then
+        doEndEvent(false)
+    end
+
+    -- Rajadas de fogo
+    if not HES_State.fireActive then return end
+    if now >= HES_State.fireEndAt then
+        HES_State.fireActive = false
+        dbg("fogo do helicoptero encerrado")
+        return
+    end
+    local intervalMs = math.max(1000, (getOpt("fireBurstInterval") or 8) * 1000)
+    if (now - HES_State.lastFireBurst) >= intervalMs then
+        HES_State.lastFireBurst = now
+        doFireBurst()
+    end
 end)
 
 -- ============================================================
@@ -255,6 +346,16 @@ local function doTrigger()
                 p:getEmitter():playSound("VehicleSirenWall")
             end
         end)
+    end
+
+    -- Ativa modo de fogo se configurado
+    if getOpt("fireEnabled") then
+        local fireSecs = math.max(5, getOpt("fireDuration") or 30)
+        HES_State.fireActive     = true
+        HES_State.fireEndAt      = now + fireSecs * 1000
+        HES_State.lastFireBurst  = now  -- primeira rajada apos o primeiro intervalo
+        HES_State.fireFirstBurst = true
+        dbg("modo de fogo ativado por " .. fireSecs .. "s")
     end
 
     dbg("evento ativado (sessao: " .. HES_State.sessionCount .. ")")

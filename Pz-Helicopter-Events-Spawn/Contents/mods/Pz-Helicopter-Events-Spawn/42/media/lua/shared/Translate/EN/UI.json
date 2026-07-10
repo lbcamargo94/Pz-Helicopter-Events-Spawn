@@ -48,5 +48,20 @@
     "HES_MsgActivationCount": "Session: %1 activation(s)",
 
     "HES_BarLabel": "Helicopter Trigger",
-    "HES_BarReady": "READY"
+    "HES_BarReady": "READY",
+
+    "HES_SecFire": "Helicopter Fire",
+    "HES_OptFireEnabled": "Enable fire simulation",
+    "HES_OptFirePlayer": "Fire can damage the player",
+    "HES_OptFireZombies": "Fire can kill nearby zombies",
+    "HES_OptFireDamage": "Player damage per burst (%)",
+    "HES_OptFireInterval": "Seconds between bursts",
+    "HES_OptFireDuration": "Fire duration (seconds)",
+    "HES_TipFireEnabled": "Simulates the helicopter firing bursts during the event. Uses the fire duration setting.",
+    "HES_TipFirePlayer": "Each burst deals damage to the player if outdoors. Set to 0% damage to disable harm.",
+    "HES_TipFireZombies": "Each burst randomly kills nearby zombies within a 15-square radius.",
+    "HES_TipFireDamage": "Health percentage lost per burst. 5 = removes 5% max health each burst.",
+    "HES_TipFireInterval": "Seconds between fire bursts. Lower = more frequent.",
+    "HES_TipFireDuration": "How long the helicopter fires after being triggered (seconds).",
+    "HES_MsgFireHit": "INCOMING FIRE! Take cover!"
 }

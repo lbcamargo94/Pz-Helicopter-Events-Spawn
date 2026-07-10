@@ -28,5 +28,14 @@ opts:addTickBox("requireConfirm",   HES_getText("HES_OptRequireConfirm"),  false
 opts:addTickBox("respectSandbox",   HES_getText("HES_OptRespectSandbox"),  false,           HES_getText("HES_TipRespectSandbox"))
 opts:addSeparator()
 
+opts:addTitle(HES_getText("HES_SecFire"))
+opts:addTickBox("fireEnabled",      HES_getText("HES_OptFireEnabled"),     false,           HES_getText("HES_TipFireEnabled"))
+opts:addTickBox("fireHitsPlayer",   HES_getText("HES_OptFirePlayer"),      true,            HES_getText("HES_TipFirePlayer"))
+opts:addTickBox("fireHitsZombies",  HES_getText("HES_OptFireZombies"),     false,           HES_getText("HES_TipFireZombies"))
+opts:addSlider( "fireDamage",       HES_getText("HES_OptFireDamage"),      1,  50, 1,   5,  HES_getText("HES_TipFireDamage"))
+opts:addSlider( "fireBurstInterval",HES_getText("HES_OptFireInterval"),    2,  30, 1,   8,  HES_getText("HES_TipFireInterval"))
+opts:addSlider( "fireDuration",     HES_getText("HES_OptFireDuration"),   10, 300, 5,  30,  HES_getText("HES_TipFireDuration"))
+opts:addSeparator()
+
 opts:addTitle(HES_getText("HES_SecDebug"))
 opts:addTickBox("debugLogs",        HES_getText("HES_OptDebugLogs"),       false,           HES_getText("HES_TipDebugLogs"))

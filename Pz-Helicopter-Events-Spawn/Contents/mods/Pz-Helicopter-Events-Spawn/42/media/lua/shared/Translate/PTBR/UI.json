@@ -48,5 +48,20 @@
     "HES_MsgActivationCount": "Sessao: %1 ativacao(oes)",
 
     "HES_BarLabel": "Gatilho de Helicoptero",
-    "HES_BarReady": "PRONTO"
+    "HES_BarReady": "PRONTO",
+
+    "HES_SecFire": "Fogo do Helicoptero",
+    "HES_OptFireEnabled": "Ativar simulacao de fogo",
+    "HES_OptFirePlayer": "Fogo pode danificar o jogador",
+    "HES_OptFireZombies": "Fogo pode matar zumbis proximos",
+    "HES_OptFireDamage": "Dano por rajada no jogador (%)",
+    "HES_OptFireInterval": "Segundos entre rajadas",
+    "HES_OptFireDuration": "Duracao do fogo (segundos)",
+    "HES_TipFireEnabled": "Simula o helicoptero atirando rajadas durante o evento.",
+    "HES_TipFirePlayer": "Cada rajada causa dano ao jogador se ele estiver ao ar livre.",
+    "HES_TipFireZombies": "Cada rajada mata aleatoriamente zumbis em raio de 15 quadrados.",
+    "HES_TipFireDamage": "Porcentagem de saude removida por rajada. 5 = 5% por rajada.",
+    "HES_TipFireInterval": "Segundos entre rajadas. Menos segundos = mais intenso.",
+    "HES_TipFireDuration": "Por quanto tempo o helicoptero atira apos ser ativado (segundos).",
+    "HES_MsgFireHit": "FOGO INIMIGO! Busque abrigo!"
 }

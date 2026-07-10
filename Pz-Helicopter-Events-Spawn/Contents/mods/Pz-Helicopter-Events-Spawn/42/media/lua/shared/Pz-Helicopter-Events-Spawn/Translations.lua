@@ -51,6 +51,20 @@ local _EN = {
     HES_MsgActivationCount    = "Session: %1 activation(s)",
     HES_BarLabel              = "Helicopter Trigger",
     HES_BarReady              = "READY",
+    HES_SecFire               = "Helicopter Fire",
+    HES_OptFireEnabled        = "Enable fire simulation",
+    HES_OptFirePlayer         = "Fire can damage the player",
+    HES_OptFireZombies        = "Fire can kill nearby zombies",
+    HES_OptFireDamage         = "Player damage per burst (%)",
+    HES_OptFireInterval       = "Seconds between bursts",
+    HES_OptFireDuration       = "Fire duration (seconds)",
+    HES_TipFireEnabled        = "Simulates the helicopter firing bursts during the event. Uses the fire duration setting.",
+    HES_TipFirePlayer         = "Each burst deals damage to the player if outdoors. Set to 0% damage to disable harm.",
+    HES_TipFireZombies        = "Each burst randomly kills nearby zombies within a 15-square radius.",
+    HES_TipFireDamage         = "Health percentage lost per burst. 5 = removes 5% max health each burst.",
+    HES_TipFireInterval       = "Seconds between fire bursts. Lower = more frequent.",
+    HES_TipFireDuration       = "How long the helicopter fires after being triggered (seconds).",
+    HES_MsgFireHit            = "INCOMING FIRE! Take cover!",
 }
 
 -- PTBR: apenas ASCII (sem acentos) para evitar KahluaException no Lua VM
@@ -100,6 +114,20 @@ local _PTBR = {
     HES_MsgActivationCount    = "Sessao: %1 ativacao(oes)",
     HES_BarLabel              = "Gatilho de Helicoptero",
     HES_BarReady              = "PRONTO",
+    HES_SecFire               = "Fogo do Helicoptero",
+    HES_OptFireEnabled        = "Ativar simulacao de fogo",
+    HES_OptFirePlayer         = "Fogo pode danificar o jogador",
+    HES_OptFireZombies        = "Fogo pode matar zumbis proximos",
+    HES_OptFireDamage         = "Dano por rajada no jogador (%)",
+    HES_OptFireInterval       = "Segundos entre rajadas",
+    HES_OptFireDuration       = "Duracao do fogo (segundos)",
+    HES_TipFireEnabled        = "Simula o helicoptero atirando rajadas durante o evento.",
+    HES_TipFirePlayer         = "Cada rajada causa dano ao jogador se ele estiver ao ar livre.",
+    HES_TipFireZombies        = "Cada rajada mata aleatoriamente zumbis em raio de 15 quadrados.",
+    HES_TipFireDamage         = "Porcentagem de saude removida por rajada. 5 = 5% por rajada.",
+    HES_TipFireInterval       = "Segundos entre rajadas. Menos segundos = mais intenso.",
+    HES_TipFireDuration       = "Por quanto tempo o helicoptero atira apos ser ativado (segundos).",
+    HES_MsgFireHit            = "FOGO INIMIGO! Busque abrigo!",
 }
 
 local _LANGS = { EN = _EN, PTBR = _PTBR }
