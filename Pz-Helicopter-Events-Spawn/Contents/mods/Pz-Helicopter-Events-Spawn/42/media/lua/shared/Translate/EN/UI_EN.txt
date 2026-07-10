@@ -11,6 +11,7 @@ UI_EN = {
     -- Rotulos das opcoes
     HET_OptKeyBind        = "Activation Key",
     HET_OptCooldown       = "Cooldown (seconds)",
+    HET_OptMinEvent       = "Minimum event duration (seconds)",
     HET_OptShowMessage    = "Show on-screen notification",
     HET_OptPlaySound      = "Play confirmation sound",
     HET_OptAllowVehicle   = "Allow activation inside vehicles",
@@ -20,6 +21,7 @@ UI_EN = {
     -- Tooltips das opcoes
     HET_TipKeyBind        = "Key that triggers the helicopter event. Default: F7.",
     HET_TipCooldown       = "Minimum time between activations in seconds. Set to 0 to disable the cooldown.",
+    HET_TipMinEvent       = "The helicopter event automatically ends after this many seconds. Set to 0 to use the game's default duration.",
     HET_TipShowMessage    = "Displays a HUD notification when the helicopter event is activated.",
     HET_TipPlaySound      = "Plays a UI sound when the event is triggered.",
     HET_TipAllowVehicle   = "When disabled, the key will not work while the player is inside a vehicle.",

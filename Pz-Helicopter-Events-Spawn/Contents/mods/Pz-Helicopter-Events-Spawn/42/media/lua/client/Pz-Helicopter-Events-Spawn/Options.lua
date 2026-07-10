@@ -12,6 +12,7 @@ opts:addSeparator()
 opts:addTitle(getText("HET_SecControls"))
 opts:addKeyBind("activationKey",  getText("HET_OptKeyBind"),        Keyboard.KEY_F7, getText("HET_TipKeyBind"))
 opts:addSlider( "cooldownSecs",   getText("HET_OptCooldown"),        0, 3600, 1, 60,  getText("HET_TipCooldown"))
+opts:addSlider( "minEventSecs",   getText("HET_OptMinEvent"),         0,  600, 1,  0,  getText("HET_TipMinEvent"))
 opts:addSeparator()
 
 opts:addTitle(getText("HET_SecBehavior"))

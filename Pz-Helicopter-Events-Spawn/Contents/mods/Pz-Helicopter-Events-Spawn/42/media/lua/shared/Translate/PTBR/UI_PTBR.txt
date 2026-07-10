@@ -11,6 +11,7 @@ UI_PTBR = {
     -- Rotulos das opcoes
     HET_OptKeyBind        = "Tecla de Ativação",
     HET_OptCooldown       = "Cooldown (segundos)",
+    HET_OptMinEvent       = "Duração mínima do evento (segundos)",
     HET_OptShowMessage    = "Exibir notificação na tela",
     HET_OptPlaySound      = "Tocar som de confirmação",
     HET_OptAllowVehicle   = "Permitir ativação dentro de veículos",
@@ -20,6 +21,7 @@ UI_PTBR = {
     -- Tooltips das opcoes
     HET_TipKeyBind        = "Tecla que dispara o evento de helicóptero. Padrão: F7.",
     HET_TipCooldown       = "Tempo mínimo entre ativações em segundos. Defina como 0 para desativar o cooldown.",
+    HET_TipMinEvent       = "O evento de helicóptero é encerrado automaticamente após este número de segundos. Defina como 0 para usar a duração padrão do jogo.",
     HET_TipShowMessage    = "Exibe uma notificação na HUD quando o evento de helicóptero é ativado.",
     HET_TipPlaySound      = "Reproduz um som de interface ao disparar o evento.",
     HET_TipAllowVehicle   = "Quando desativado, a tecla não funcionará enquanto o jogador estiver dentro de um veículo.",

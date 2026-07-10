@@ -13,6 +13,7 @@ require "Pz-Helicopter-Events-Spawn/Options"
 local _lastActivation  = 0       -- getTimeInMillis() da ultima ativacao
 local _pendingConfirm  = false   -- aguardando segunda pressao de confirmacao
 local _pendingTime     = 0       -- quando a confirmacao foi solicitada
+local _eventEndAt      = 0       -- quando encerrar o evento automaticamente (0 = nao encerrar)
 
 local CONFIRM_WINDOW   = 5000    -- janela para confirmar (ms)
 
@@ -69,7 +70,6 @@ function HET_MsgPanel:render()
         return
     end
 
-    -- fade out durante os ultimos 1500ms
     local fadeStart = self.duration - 1500
     local alpha = elapsed > fadeStart
         and (1 - (elapsed - fadeStart) / 1500)
@@ -86,18 +86,16 @@ function HET_MsgPanel:render()
         local r, g, b
 
         if i == 1 and not self.isWarning then
-            -- titulo principal: amarelo
             r, g, b = 1.0, 0.85, 0.15
         elseif i == 1 and self.isWarning then
-            -- aviso: laranja
             r, g, b = 1.0, 0.55, 0.10
         else
             r, g, b = 0.90, 0.90, 0.90
         end
 
-        local font   = (i == 1) and UIFont.Medium or UIFont.Small
-        local textW  = getTextManager():MeasureStringX(font, line)
-        local textX  = math.floor((w - textW) / 2)
+        local font  = (i == 1) and UIFont.Medium or UIFont.Small
+        local textW = getTextManager():MeasureStringX(font, line)
+        local textX = math.floor((w - textW) / 2)
 
         self:drawText(line, textX, y, r, g, b, alpha, font)
     end
@@ -108,6 +106,18 @@ local function showHUDMsg(lines, isWarning)
     panel:initialise()
     panel:addToUIManager()
 end
+
+-- ============================================================
+--  Encerramento automatico do evento
+-- ============================================================
+
+Events.OnTick.Add(function()
+    if _eventEndAt == 0 then return end
+    if getTimeInMillis() < _eventEndAt then return end
+    _eventEndAt = 0
+    pcall(endHelicopter)
+    dbg("evento encerrado apos duracao configurada")
+end)
 
 -- ============================================================
 --  Logica de ativacao
@@ -154,7 +164,16 @@ local function doTrigger()
     end
 
     _lastActivation = now
-    dbg("evento ativado")
+
+    -- agenda encerramento automatico se duracao configurada
+    local minSecs = getOpt("minEventSecs") or 0
+    if minSecs > 0 then
+        _eventEndAt = now + minSecs * 1000
+        dbg("evento ativado, encerramento em " .. minSecs .. "s")
+    else
+        _eventEndAt = 0
+        dbg("evento ativado (duracao padrao do jogo)")
+    end
 
     if getOpt("showMessage") then
         showHUDMsg({
@@ -191,12 +210,10 @@ Events.OnKeyPressed.Add(function(key)
 
     if getOpt("requireConfirm") then
         if _pendingConfirm and (now - _pendingTime) < CONFIRM_WINDOW then
-            -- segunda pressao: confirma e dispara
             _pendingConfirm = false
             dbg("confirmacao recebida")
             doTrigger()
         else
-            -- primeira pressao: aguarda confirmacao
             _pendingConfirm = true
             _pendingTime    = now
             dbg("aguardando confirmacao")
