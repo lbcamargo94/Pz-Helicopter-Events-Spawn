@@ -135,17 +135,22 @@ local _resolved = nil
 
 local function _resolve()
     if _resolved then return _resolved end
-    -- getCore() pode ser nil durante o carregamento inicial do mod (antes do jogo iniciar).
-    -- Kahlua nao captura RuntimeException Java dentro de pcall, entao usamos checagem direta.
-    local core = getCore()
-    if not core then
-        return _EN  -- sem cache: nova tentativa na proxima chamada
+    -- B42: idioma via Translator.getLanguage():name() (getCore() nao tem getLanguage())
+    -- Translator pode nao estar disponivel durante o carregamento compartilhado do mod.
+    if Translator ~= nil then
+        local tl = Translator.getLanguage()
+        if tl ~= nil then
+            local n = tl:name()
+            if n and _LANGS[n] then
+                _resolved = _LANGS[n]
+                return _resolved
+            end
+        end
+        _resolved = _EN
+        return _resolved
     end
-    local lang = "EN"
-    local l = tostring(core:getLanguage())
-    if _LANGS[l] then lang = l end
-    _resolved = _LANGS[lang] or _EN
-    return _resolved
+    -- Translator indisponivel: retorna EN sem cachear para tentar novamente depois
+    return _EN
 end
 
 -- Funcao global usada em todos os arquivos do mod
