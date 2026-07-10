@@ -1,18 +1,37 @@
 UI_EN = {
-    HET_OptTitle             = "Helicopter Event Trigger",
-    HET_OptKeyBind           = "Activation Key",
-    HET_OptCooldown          = "Cooldown (seconds)",
-    HET_OptShowMessage       = "Show confirmation message",
-    HET_OptPlaySound         = "Play confirmation sound",
-    HET_OptAllowVehicle      = "Allow activation inside vehicles",
-    HET_OptRequireConfirm    = "Require confirmation before activating",
-    HET_OptDebugLogs         = "Enable debug logs",
+    -- Mod options: titulo e descricao geral
+    HET_OptTitle          = "Helicopter Event Trigger",
+    HET_OptDesc           = "Press the configured key to immediately trigger the vanilla PZ helicopter event. Configure cooldown and behavior below.",
 
-    HET_MsgActivated         = "HELICOPTER EVENT ACTIVATED",
-    HET_MsgRegion            = "A helicopter was spotted in the area.",
-    HET_MsgPrepare           = "Get ready for visitors.",
-    HET_MsgConfirmTitle      = "CONFIRM ACTIVATION?",
-    HET_MsgConfirmBody       = "Press %1 again to confirm.",
-    HET_MsgCooldown          = "Cooldown: %1 seconds remaining.",
-    HET_MsgVehicle           = "Cannot activate while inside a vehicle.",
+    -- Secoes
+    HET_SecControls       = "Controls",
+    HET_SecBehavior       = "Behavior",
+    HET_SecDebug          = "Debug",
+
+    -- Rotulos das opcoes
+    HET_OptKeyBind        = "Activation Key",
+    HET_OptCooldown       = "Cooldown (seconds)",
+    HET_OptShowMessage    = "Show on-screen notification",
+    HET_OptPlaySound      = "Play confirmation sound",
+    HET_OptAllowVehicle   = "Allow activation inside vehicles",
+    HET_OptRequireConfirm = "Require double-press confirmation",
+    HET_OptDebugLogs      = "Enable debug logs",
+
+    -- Tooltips das opcoes
+    HET_TipKeyBind        = "Key that triggers the helicopter event. Default: F7.",
+    HET_TipCooldown       = "Minimum time between activations in seconds. Set to 0 to disable the cooldown.",
+    HET_TipShowMessage    = "Displays a HUD notification when the helicopter event is activated.",
+    HET_TipPlaySound      = "Plays a UI sound when the event is triggered.",
+    HET_TipAllowVehicle   = "When disabled, the key will not work while the player is inside a vehicle.",
+    HET_TipRequireConfirm = "When enabled, press the activation key twice within 5 seconds to confirm before triggering.",
+    HET_TipDebugLogs      = "Prints debug messages to the console. Useful for troubleshooting.",
+
+    -- Mensagens HUD em jogo
+    HET_MsgActivated      = "HELICOPTER EVENT ACTIVATED",
+    HET_MsgRegion         = "A helicopter was spotted in the area.",
+    HET_MsgPrepare        = "Get ready for visitors.",
+    HET_MsgConfirmTitle   = "CONFIRM ACTIVATION?",
+    HET_MsgConfirmBody    = "Press %1 again to confirm.",
+    HET_MsgCooldown       = "Cooldown: %1 seconds remaining.",
+    HET_MsgVehicle        = "Cannot activate while inside a vehicle.",
 }

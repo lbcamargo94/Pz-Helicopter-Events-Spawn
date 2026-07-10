@@ -1,18 +1,37 @@
 UI_PTBR = {
-    HET_OptTitle             = "Helicopter Event Trigger",
-    HET_OptKeyBind           = "Tecla de Ativação",
-    HET_OptCooldown          = "Cooldown (segundos)",
-    HET_OptShowMessage       = "Mostrar mensagem de confirmação",
-    HET_OptPlaySound         = "Tocar som de confirmação",
-    HET_OptAllowVehicle      = "Permitir ativação dentro de veículos",
-    HET_OptRequireConfirm    = "Exigir confirmação antes de ativar",
-    HET_OptDebugLogs         = "Ativar logs de depuração",
+    -- Mod options: titulo e descricao geral
+    HET_OptTitle          = "Pz-Helicopter-Events-Spawn",
+    HET_OptDesc           = "Pressione a tecla configurada para disparar imediatamente o evento de helicóptero vanilla do PZ. Configure o cooldown e o comportamento abaixo.",
 
-    HET_MsgActivated         = "EVENTO DE HELICÓPTERO ATIVADO",
-    HET_MsgRegion            = "Um helicóptero foi avistado na região.",
-    HET_MsgPrepare           = "Prepare-se para receber visitas.",
-    HET_MsgConfirmTitle      = "CONFIRMAR ATIVAÇÃO?",
-    HET_MsgConfirmBody       = "Pressione %1 novamente para confirmar.",
-    HET_MsgCooldown          = "Cooldown: %1 segundos restantes.",
-    HET_MsgVehicle           = "Não é possível ativar dentro de um veículo.",
+    -- Secoes
+    HET_SecControls       = "Controles",
+    HET_SecBehavior       = "Comportamento",
+    HET_SecDebug          = "Depuração",
+
+    -- Rotulos das opcoes
+    HET_OptKeyBind        = "Tecla de Ativação",
+    HET_OptCooldown       = "Cooldown (segundos)",
+    HET_OptShowMessage    = "Exibir notificação na tela",
+    HET_OptPlaySound      = "Tocar som de confirmação",
+    HET_OptAllowVehicle   = "Permitir ativação dentro de veículos",
+    HET_OptRequireConfirm = "Exigir confirmação por duplo clique",
+    HET_OptDebugLogs      = "Ativar logs de depuração",
+
+    -- Tooltips das opcoes
+    HET_TipKeyBind        = "Tecla que dispara o evento de helicóptero. Padrão: F7.",
+    HET_TipCooldown       = "Tempo mínimo entre ativações em segundos. Defina como 0 para desativar o cooldown.",
+    HET_TipShowMessage    = "Exibe uma notificação na HUD quando o evento de helicóptero é ativado.",
+    HET_TipPlaySound      = "Reproduz um som de interface ao disparar o evento.",
+    HET_TipAllowVehicle   = "Quando desativado, a tecla não funcionará enquanto o jogador estiver dentro de um veículo.",
+    HET_TipRequireConfirm = "Quando ativado, pressione a tecla de ativação duas vezes em até 5 segundos para confirmar antes de disparar.",
+    HET_TipDebugLogs      = "Exibe mensagens de depuração no console. Útil para diagnóstico de problemas.",
+
+    -- Mensagens HUD em jogo
+    HET_MsgActivated      = "EVENTO DE HELICÓPTERO ATIVADO",
+    HET_MsgRegion         = "Um helicóptero foi avistado na região.",
+    HET_MsgPrepare        = "Prepare-se para receber visitas.",
+    HET_MsgConfirmTitle   = "CONFIRMAR ATIVAÇÃO?",
+    HET_MsgConfirmBody    = "Pressione %1 novamente para confirmar.",
+    HET_MsgCooldown       = "Cooldown: %1 segundos restantes.",
+    HET_MsgVehicle        = "Não é possível ativar dentro de um veículo.",
 }
