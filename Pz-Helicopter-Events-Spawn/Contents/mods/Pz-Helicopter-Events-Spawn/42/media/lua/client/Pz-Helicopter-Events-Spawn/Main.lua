@@ -134,11 +134,11 @@ local function doFireBurst()
     local player = getPlayer()
     if not player or player:isDead() then return end
 
-    -- Dano no jogador (apenas ao ar livre - helicoptero nao mira quem esta coberto)
+    -- Dano no jogador (apenas ao ar livre)
     if getOpt("fireHitsPlayer") then
-        local outdoor = true
-        pcall(function() outdoor = player:isOutside() end)
-        if outdoor then
+        local curSq  = player:getCurrentSquare()
+        local indoor = curSq ~= nil and curSq:getRoom() ~= nil
+        if not indoor then
             local dmgPct = (getOpt("fireDamage") or 5) / 100.0
             local newHp  = math.max(0.01, player:getHealth() - dmgPct)
             player:setHealth(newHp)
@@ -150,42 +150,45 @@ local function doFireBurst()
 
     -- Mata zumbis proximos aleatoriamente
     if getOpt("fireHitsZombies") then
-        local px = math.floor(player:getX())
-        local py = math.floor(player:getY())
-        local pz = math.floor(player:getZ())
-        local radius = 15
-        local killed = 0
-        for ox = -radius, radius do
-            for oy = -radius, radius do
-                if math.random(1, 100) <= 40 then
-                    local sq = nil
-                    pcall(function() sq = getCell():getGridSquare(px + ox, py + oy, pz) end)
-                    if sq then
-                        local movables = sq:getMovingObjects()
-                        if movables then
-                            for i = movables:size(), 1, -1 do
-                                local obj = nil
-                                pcall(function() obj = movables:get(i - 1) end)
-                                if obj and instanceof(obj, "IsoZombie") then
-                                    pcall(function()
-                                        obj:removeFromWorld()
-                                        obj:removeFromSquare()
-                                    end)
-                                    killed = killed + 1
+        local cell = getCell()
+        if cell then
+            local px     = math.floor(player:getX())
+            local py     = math.floor(player:getY())
+            local pz     = math.floor(player:getZ())
+            local radius = 15
+            local toKill = {}
+            for ox = -radius, radius do
+                for oy = -radius, radius do
+                    if math.random(1, 100) <= 40 then
+                        local sq = cell:getGridSquare(px + ox, py + oy, pz)
+                        if sq then
+                            local movables = sq:getMovingObjects()
+                            if movables then
+                                local n = movables:size()
+                                for i = 0, n - 1 do
+                                    local obj = movables:get(i)
+                                    if obj and instanceof(obj, "IsoZombie") then
+                                        toKill[#toKill + 1] = obj
+                                    end
                                 end
                             end
                         end
                     end
                 end
             end
+            -- mata apos coletar para evitar concurrent modification
+            for _, z in ipairs(toKill) do
+                z:removeFromWorld()
+                z:removeFromSquare()
+            end
+            dbg("fogo eliminou " .. #toKill .. " zumbi(s)")
         end
-        dbg("fogo eliminou " .. killed .. " zumbi(s)")
     end
 
-    -- Ruido de tiro para atrair mais zumbis
-    pcall(function()
+    -- Ruido de tiro para atrair zumbis
+    if addSound then
         addSound(player, player:getX(), player:getY(), player:getZ(), 40, 1)
-    end)
+    end
 
     -- Notificacao HUD apenas na primeira rajada
     if HES_State.fireFirstBurst then
