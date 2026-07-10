@@ -135,27 +135,30 @@ local _resolved = nil
 
 local function _resolve()
     if _resolved then return _resolved end
+    -- getCore() pode ser nil durante o carregamento inicial do mod (antes do jogo iniciar).
+    -- Kahlua nao captura RuntimeException Java dentro de pcall, entao usamos checagem direta.
+    local core = getCore()
+    if not core then
+        return _EN  -- sem cache: nova tentativa na proxima chamada
+    end
     local lang = "EN"
-    pcall(function()
-        local l = tostring(getCore():getLanguage())
-        if _LANGS[l] then lang = l end
-    end)
+    local l = tostring(core:getLanguage())
+    if _LANGS[l] then lang = l end
     _resolved = _LANGS[lang] or _EN
     return _resolved
 end
 
 -- Funcao global usada em todos os arquivos do mod
--- Tenta getText() primeiro; usa tabela Lua como fallback garantido
 function HES_getText(key, arg1)
-    local val = getText(key)
-    if val == key then
+    local val = nil
+    local ok, r = pcall(getText, key)
+    if ok then val = r end
+    if val == nil or val == key then
         local t = _resolve()
         val = (t and t[key]) or key
     end
-    -- Substituicao de %1 (getText nativo faz isso automaticamente,
-    -- mas nosso fallback precisa fazer manualmente)
-    if arg1 ~= nil and val:find("%%1") then
+    if arg1 ~= nil and type(val) == "string" and val:find("%%1") then
         val = val:gsub("%%1", tostring(arg1))
     end
-    return val
+    return val or key
 end
