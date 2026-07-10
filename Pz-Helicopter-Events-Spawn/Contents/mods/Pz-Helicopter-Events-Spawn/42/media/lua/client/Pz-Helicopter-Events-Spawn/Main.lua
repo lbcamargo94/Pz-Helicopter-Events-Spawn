@@ -185,9 +185,21 @@ local function doFireBurst()
         end
     end
 
-    -- Ruido de tiro para atrair zumbis
+    -- Ruido de tiro para atrair zumbis (noise event do motor do jogo)
     if addSound then
         addSound(player, player:getX(), player:getY(), player:getZ(), 40, 1)
+    end
+
+    -- Som de disparo do helicoptero (2D / sem direcional para soar "do ceu")
+    -- AssaultShot = rajada unica | MetaAssaultRifle1 = meta-evento de multiplos tiros
+    local sm = getSoundManager and getSoundManager()
+    if sm then
+        -- alterna entre AssaultShot e MetaAssaultRifle1 para variedade
+        if math.random(1, 3) == 1 then
+            sm:playUISound("MetaAssaultRifle1")
+        else
+            sm:playUISound("AssaultShot")
+        end
     end
 
     -- Notificacao HUD apenas na primeira rajada
