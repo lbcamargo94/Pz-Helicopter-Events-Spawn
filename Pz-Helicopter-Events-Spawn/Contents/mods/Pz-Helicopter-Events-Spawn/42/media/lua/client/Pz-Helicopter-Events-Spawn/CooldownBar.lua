@@ -1,15 +1,29 @@
 -- ============================================================
 --  CooldownBar.lua -- Pz-Helicopter-Events-Spawn
---  Barra de cooldown persistente no canto inferior direito
+--  Painel persistente com visual identico ao inventario B42
 --  Depende de HES_State definido em Main.lua
 -- ============================================================
 
 HES_CooldownBar = ISPanel:derive("HES_CooldownBar")
 
-local BAR_W   = 220
-local BAR_H   = 54
-local MARGIN  = 14
-local PAD     = 10
+-- Dimensoes
+local BAR_W      = 220
+local TITLE_H    = 19   -- mesmo valor de ISWindow.TitleBarHeight
+local CONTENT_H  = 52   -- area abaixo do titulo
+local BAR_H      = TITLE_H + CONTENT_H
+local MARGIN     = 14
+
+-- Cores do inventario B42 (de PZAPI/ui/organisms/Inventory.lua)
+local INV_BG_R = 38 / 255   -- 0.149
+local INV_BG_G = 38 / 255
+local INV_BG_B = 38 / 255
+local INV_BG_A = 0.9
+
+-- Cor da borda (cinza medio, identico ao ISInventoryPage)
+local BORDER_R = 0.40
+local BORDER_G = 0.40
+local BORDER_B = 0.40
+local BORDER_A = 0.85
 
 function HES_CooldownBar:new()
     local sw = getCore():getScreenWidth()
@@ -18,88 +32,106 @@ function HES_CooldownBar:new()
     local y  = sh - BAR_H - MARGIN
 
     local o = ISPanel.new(self, x, y, BAR_W, BAR_H)
+
+    -- Herda o background do ISPanel (prerender() cuida do fundo + borda externa)
+    o.backgroundColor = { r = INV_BG_R, g = INV_BG_G, b = INV_BG_B, a = INV_BG_A }
+    o.borderColor     = { r = BORDER_R,  g = BORDER_G,  b = BORDER_B,  a = BORDER_A }
+
     setmetatable(o, self)
     self.__index = self
     return o
 end
 
 function HES_CooldownBar:render()
-    -- respeita opcao de visibilidade
+    -- Verifica visibilidade
     if not PZAPI or not PZAPI.ModOptions then return end
     local options = PZAPI.ModOptions:getOptions("Pz-Helicopter-Events-Spawn")
     if not options then return end
     local showOpt = options:getOption("showCooldownBar")
     if showOpt and not showOpt:getValue() then return end
-
     if not HES_State then return end
 
-    local now       = getTimeInMillis()
+    -- Calcula progresso do cooldown
+    local now        = getTimeInMillis()
     local cooldownMs = 0
     local cdOpt = options:getOption("cooldownSecs")
     if cdOpt then
         cooldownMs = (cdOpt:getValue() or 60) * 1000
     end
-
-    local elapsed  = now - (HES_State.lastActivation or 0)
+    local elapsed    = now - (HES_State.lastActivation or 0)
     local onCooldown = cooldownMs > 0 and elapsed < cooldownMs
-    local progress   = 1.0
-    if onCooldown then
-        progress = elapsed / cooldownMs
-    end
+    local progress   = onCooldown and (elapsed / cooldownMs) or 1.0
 
     local w = self.width
-    local h = self.height
 
-    -- fundo
-    self:drawRect(0, 0, w, h, 0.75, 0.05, 0.05, 0.05)
-    self:drawRectBorder(0, 0, w, h, 0.85, 0.35, 0.35, 0.35)
+    -- -------------------------------------------------------
+    --  Titulo (barra superior, identico ao ISInventoryPage)
+    -- -------------------------------------------------------
+    -- Borda ao redor da faixa de titulo (igual ao inventario)
+    self:drawRectBorder(0, 0, w, TITLE_H, BORDER_A, BORDER_R, BORDER_G, BORDER_B)
 
-    -- label
-    local label = getText("HES_BarLabel")
-    local labelFont = UIFont.Small
-    local labelW = getTextManager():MeasureStringX(labelFont, label)
-    local labelX = math.floor((w - labelW) / 2)
-    self:drawText(label, labelX, PAD, 0.80, 0.80, 0.80, 0.90, labelFont)
+    local titleFont = UIFont.Small
+    local titleH    = getTextManager():getFontHeight(titleFont)
+    local titleTxt  = getText("HES_BarLabel")
+    local titleW    = getTextManager():MeasureStringX(titleFont, titleTxt)
+    local titleX    = math.floor((w - titleW) / 2)
+    local titleY    = math.floor((TITLE_H - titleH) / 2)
+    self:drawText(titleTxt, titleX, titleY, 1, 1, 1, 1, titleFont)
 
-    local barY  = PAD + 16
-    local barH  = 8
-    local barX  = PAD
-    local barFW = w - PAD * 2
+    -- -------------------------------------------------------
+    --  Area de conteudo
+    -- -------------------------------------------------------
+    local PAD    = 10
+    local cy     = TITLE_H + 8   -- y do conteudo
+    local barX   = PAD
+    local barFW  = w - PAD * 2
+    local barH   = 8
 
-    -- trilho da barra
-    self:drawRect(barX, barY, barFW, barH, 0.60, 0.15, 0.15, 0.15)
+    -- Trilho da barra (fundo escuro)
+    self:drawRect(barX, cy, barFW, barH, 0.70, 0.10, 0.10, 0.10)
 
-    -- preenchimento: verde quando pronto, amarelo durante cooldown
-    local fillW = math.floor(barFW * progress)
+    -- Preenchimento: amarelo durante cooldown, verde quando pronto
+    local fillW = math.max(0, math.floor(barFW * progress))
     if onCooldown then
-        self:drawRect(barX, barY, fillW, barH, 0.80, 0.80, 0.60, 0.10)
+        self:drawRect(barX, cy, fillW, barH, 0.85, 0.76, 0.56, 0.10)
     else
-        self:drawRect(barX, barY, fillW, barH, 0.80, 0.20, 0.75, 0.20)
+        self:drawRect(barX, cy, fillW, barH, 0.85, 0.18, 0.70, 0.18)
     end
 
-    -- texto de status
-    local statusFont = UIFont.Small
-    local statusText
+    -- Borda do trilho (igual ao estilo de progresso do inventario)
+    self:drawRectBorder(barX, cy, barFW, barH, 0.50, BORDER_R, BORDER_G, BORDER_B)
+
+    -- -------------------------------------------------------
+    --  Textos de status e contador
+    -- -------------------------------------------------------
+    local textFont = UIFont.Small
+    local textH    = getTextManager():getFontHeight(textFont)
+    local textY    = cy + barH + 6
+
+    -- Status (esquerda)
+    local statusTxt
     if onCooldown then
         local remaining = math.ceil((cooldownMs - elapsed) / 1000)
-        statusText = tostring(remaining) .. "s"
+        statusTxt = tostring(remaining) .. "s"
     else
-        statusText = getText("HES_BarReady")
+        statusTxt = getText("HES_BarReady")
     end
 
-    -- contador de sessao
-    local count = HES_State.sessionCount or 0
-    local countText = "#" .. tostring(count)
+    -- Cor do status: branco pronto, amarelo em cooldown
+    local sr, sg, sb = 0.90, 0.90, 0.90
+    if onCooldown then sr, sg, sb = 0.90, 0.80, 0.25 end
+    self:drawText(statusTxt, PAD, textY, sr, sg, sb, 1, textFont)
 
-    local countW   = getTextManager():MeasureStringX(statusFont, countText)
-    local textY    = barY + barH + 4
-
-    self:drawText(statusText, PAD, textY, 0.90, 0.90, 0.90, 0.90, statusFont)
-    self:drawText(countText, w - PAD - countW, textY, 0.60, 0.60, 0.60, 0.80, statusFont)
+    -- Contador de sessao (direita, cinza discreto)
+    local count     = HES_State.sessionCount or 0
+    local countTxt  = "#" .. tostring(count)
+    local countW    = getTextManager():MeasureStringX(textFont, countTxt)
+    self:drawText(countTxt, w - PAD - countW, textY, 0.55, 0.55, 0.55, 1, textFont)
 end
 
 -- ============================================================
---  Criacao e registro da barra no UIManager
+--  Criacao e registro no UIManager (OnGameStart cobre novo
+--  jogo e save carregado, igual ao ISChat e ISHotbar)
 -- ============================================================
 
 local _barPanel = nil
