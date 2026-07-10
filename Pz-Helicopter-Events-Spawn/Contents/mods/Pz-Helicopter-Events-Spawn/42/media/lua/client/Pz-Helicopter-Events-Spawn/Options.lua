@@ -1,10 +1,10 @@
 -- ============================================================
---  Options.lua -- HelicopterTrigger
+--  Options.lua -- Pz-Helicopter-Events-Spawn
 --  Registra opcoes nativas do mod (Opcoes > Mods) via PZAPI
 --  Nomes exibidos sao traduzidos via getText() (UI_EN / UI_PTBR)
 -- ============================================================
 
-local opts = PZAPI.ModOptions:create("HelicopterTrigger", getText("HET_OptTitle"))
+local opts = PZAPI.ModOptions:create("Pz-Helicopter-Events-Spawn", getText("HET_OptTitle"))
 
 opts:addKeyBind("activationKey",  getText("HET_OptKeyBind"),        Keyboard.KEY_F7)
 opts:addSlider( "cooldownSecs",   getText("HET_OptCooldown"),        0, 3600, 1, 60)

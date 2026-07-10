@@ -1,10 +1,10 @@
 -- ============================================================
---  Main.lua -- HelicopterTrigger v1.0.0
+--  Main.lua -- Pz-Helicopter-Events-Spawn v1.0.0
 --  Tecla configuravel dispara testHelicopter() (evento vanilla)
 --  Requer B42.19+, Single Player
 -- ============================================================
 
-require "HelicopterTrigger/Options"
+require "Pz-Helicopter-Events-Spawn/Options"
 
 -- ============================================================
 --  Estado interno
@@ -21,7 +21,7 @@ local CONFIRM_WINDOW   = 5000    -- janela para confirmar (ms)
 -- ============================================================
 
 local function getOpt(id)
-    local options = PZAPI.ModOptions:getOptions("HelicopterTrigger")
+    local options = PZAPI.ModOptions:getOptions("Pz-Helicopter-Events-Spawn")
     if not options then return nil end
     local opt = options:getOption(id)
     if not opt then return nil end
@@ -30,7 +30,7 @@ end
 
 local function dbg(msg)
     if getOpt("debugLogs") then
-        print("[HelicopterTrigger] " .. tostring(msg))
+        print("[Pz-Helicopter-Events-Spawn] " .. tostring(msg))
     end
 end
 
@@ -180,7 +180,7 @@ Events.OnKeyPressed.Add(function(key)
     if not player or player:isDead() then return end
     if not getGameTime() then return end
 
-    local options = PZAPI.ModOptions:getOptions("HelicopterTrigger")
+    local options = PZAPI.ModOptions:getOptions("Pz-Helicopter-Events-Spawn")
     if not options then return end
 
     local keyOpt = options:getOption("activationKey")

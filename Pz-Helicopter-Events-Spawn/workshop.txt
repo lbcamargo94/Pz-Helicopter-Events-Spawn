@@ -53,4 +53,4 @@ description=[*] Uses the game's built-in vanilla helicopter event
 description=[/list]
 tags=Build 42;Gameplay
 visibility=public
-mods=HelicopterTrigger
+mods=Pz-Helicopter-Events-Spawn

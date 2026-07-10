@@ -1,5 +1,5 @@
 name=Helicopter Event Trigger
-id=HelicopterTrigger
+id=Pz-Helicopter-Events-Spawn
 description=Pressione F7 (configuravel) para disparar o evento de helicoptero. Configure em Opcoes > Mods.
 modversion=1.0.0
 pzversion=42
