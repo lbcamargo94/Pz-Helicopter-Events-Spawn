@@ -149,39 +149,31 @@ local function doFireBurst()
     end
 
     -- Mata zumbis proximos aleatoriamente
+    -- Usa getObjectListForLua() + iteracao reversa (mesmo padrao de DebugContextMenu.lua:597)
     if getOpt("fireHitsZombies") then
         local cell = getCell()
         if cell then
-            local px     = math.floor(player:getX())
-            local py     = math.floor(player:getY())
-            local pz     = math.floor(player:getZ())
-            local radius = 15
-            local toKill = {}
-            for ox = -radius, radius do
-                for oy = -radius, radius do
-                    if math.random(1, 100) <= 40 then
-                        local sq = cell:getGridSquare(px + ox, py + oy, pz)
-                        if sq then
-                            local movables = sq:getMovingObjects()
-                            if movables then
-                                local n = movables:size()
-                                for i = 0, n - 1 do
-                                    local obj = movables:get(i)
-                                    if obj and instanceof(obj, "IsoZombie") then
-                                        toKill[#toKill + 1] = obj
-                                    end
-                                end
-                            end
+            local px       = player:getX()
+            local py       = player:getY()
+            local radius   = 15
+            local radiusSq = radius * radius
+            local objects  = cell:getObjectListForLua()
+            local killed   = 0
+            if objects then
+                for i = objects:size(), 1, -1 do
+                    local obj = objects:get(i - 1)
+                    if obj and instanceof(obj, "IsoZombie") then
+                        local dx = obj:getX() - px
+                        local dy = obj:getY() - py
+                        if (dx * dx + dy * dy) <= radiusSq and math.random(1, 100) <= 40 then
+                            obj:removeFromWorld()
+                            obj:removeFromSquare()
+                            killed = killed + 1
                         end
                     end
                 end
             end
-            -- mata apos coletar para evitar concurrent modification
-            for _, z in ipairs(toKill) do
-                z:removeFromWorld()
-                z:removeFromSquare()
-            end
-            dbg("fogo eliminou " .. #toKill .. " zumbi(s)")
+            dbg("fogo eliminou " .. killed .. " zumbi(s)")
         end
     end
 
