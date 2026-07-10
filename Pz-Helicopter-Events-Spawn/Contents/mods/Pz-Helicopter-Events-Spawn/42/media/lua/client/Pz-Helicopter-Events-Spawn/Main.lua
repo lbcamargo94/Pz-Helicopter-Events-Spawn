@@ -133,7 +133,7 @@ local function doEndEvent(fromManual)
     else
         dbg("evento encerrado apos duracao configurada")
     end
-    showHUDMsg({ getText("HES_MsgEventEnded") }, true)
+    showHUDMsg({ HES_getText("HES_MsgEventEnded") }, true)
 end
 
 Events.OnTick.Add(function()
@@ -162,7 +162,7 @@ local function doTrigger()
         local sv = SandboxVars
         if sv and sv.Helicopter ~= nil and sv.Helicopter == 1 then
             dbg("bloqueado pelo sandbox")
-            showHUDMsg({ getText("HES_MsgSandboxBlocked") }, true)
+            showHUDMsg({ HES_getText("HES_MsgSandboxBlocked") }, true)
             return
         end
     end
@@ -172,9 +172,8 @@ local function doTrigger()
     if minDays > 0 then
         local currentDay = math.floor(getGameTime():getWorldAgeHours() / 24)
         if currentDay < minDays then
-            local unlockDay = minDays
             dbg("bloqueado por dia: dia atual " .. currentDay .. " < minDays " .. minDays)
-            showHUDMsg({ getText("HES_MsgDayBlocked", tostring(unlockDay)) }, true)
+            showHUDMsg({ HES_getText("HES_MsgDayBlocked", tostring(minDays)) }, true)
             return
         end
     end
@@ -182,7 +181,7 @@ local function doTrigger()
     -- restricao de veiculo
     if not getOpt("allowInVehicle") and player:getVehicle() ~= nil then
         dbg("dentro de veiculo, bloqueado")
-        showHUDMsg({ getText("HES_MsgVehicle") }, true)
+        showHUDMsg({ HES_getText("HES_MsgVehicle") }, true)
         return
     end
 
@@ -192,7 +191,7 @@ local function doTrigger()
     if cooldownMs > 0 and (now - HES_State.lastActivation) < cooldownMs then
         local remaining = math.ceil((cooldownMs - (now - HES_State.lastActivation)) / 1000)
         dbg("cooldown ativo: " .. remaining .. "s")
-        showHUDMsg({ getText("HES_MsgCooldown", tostring(remaining)) }, true)
+        showHUDMsg({ HES_getText("HES_MsgCooldown", tostring(remaining)) }, true)
         return
     end
 
@@ -201,7 +200,7 @@ local function doTrigger()
     if chance < 100 then
         if math.random(1, 100) > chance then
             dbg("chance falhou (" .. chance .. "%)")
-            showHUDMsg({ getText("HES_MsgChanceFail") }, true)
+            showHUDMsg({ HES_getText("HES_MsgChanceFail") }, true)
             return
         end
     end
@@ -243,14 +242,19 @@ local function doTrigger()
 
     -- notificacoes
     showHUDMsg({
-        getText("HES_MsgActivated"),
-        getText("HES_MsgRegion"),
-        getText("HES_MsgPrepare"),
-        getText("HES_MsgActivationCount", tostring(HES_State.sessionCount)),
+        HES_getText("HES_MsgActivated"),
+        HES_getText("HES_MsgRegion"),
+        HES_getText("HES_MsgPrepare"),
+        HES_getText("HES_MsgActivationCount", tostring(HES_State.sessionCount)),
     })
 
     if getOpt("playSound") then
-        pcall(function() getSoundManager():playUISound("UIActivateButton") end)
+        pcall(function()
+            local p = getPlayer()
+            if p then
+                p:getEmitter():playSound("VehicleSirenWall")
+            end
+        end)
     end
 
     dbg("evento ativado (sessao: " .. HES_State.sessionCount .. ")")
@@ -302,8 +306,8 @@ Events.OnKeyPressed.Add(function(key)
             if getOpt("showMessage") then
                 local keyName = getKeyName(activKeyOpt:getValue())
                 local panel = HES_MsgPanel:new({
-                    getText("HES_MsgConfirmTitle"),
-                    getText("HES_MsgConfirmBody", keyName),
+                    HES_getText("HES_MsgConfirmTitle"),
+                    HES_getText("HES_MsgConfirmBody", keyName),
                 }, true)
                 panel:initialise()
                 panel:addToUIManager()
