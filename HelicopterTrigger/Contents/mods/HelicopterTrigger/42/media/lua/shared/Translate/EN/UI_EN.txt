@@ -1,0 +1,18 @@
+UI_EN = {
+    HET_OptTitle             = "Helicopter Event Trigger",
+    HET_OptKeyBind           = "Activation Key",
+    HET_OptCooldown          = "Cooldown (seconds)",
+    HET_OptShowMessage       = "Show confirmation message",
+    HET_OptPlaySound         = "Play confirmation sound",
+    HET_OptAllowVehicle      = "Allow activation inside vehicles",
+    HET_OptRequireConfirm    = "Require confirmation before activating",
+    HET_OptDebugLogs         = "Enable debug logs",
+
+    HET_MsgActivated         = "HELICOPTER EVENT ACTIVATED",
+    HET_MsgRegion            = "A helicopter was spotted in the area.",
+    HET_MsgPrepare           = "Get ready for visitors.",
+    HET_MsgConfirmTitle      = "CONFIRM ACTIVATION?",
+    HET_MsgConfirmBody       = "Press %1 again to confirm.",
+    HET_MsgCooldown          = "Cooldown: %1 seconds remaining.",
+    HET_MsgVehicle           = "Cannot activate while inside a vehicle.",
+}

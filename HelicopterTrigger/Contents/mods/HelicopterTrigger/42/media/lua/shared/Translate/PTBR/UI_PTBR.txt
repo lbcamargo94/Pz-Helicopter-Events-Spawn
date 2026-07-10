@@ -1,0 +1,18 @@
+UI_PTBR = {
+    HET_OptTitle             = "Helicopter Event Trigger",
+    HET_OptKeyBind           = "Tecla de Ativação",
+    HET_OptCooldown          = "Cooldown (segundos)",
+    HET_OptShowMessage       = "Mostrar mensagem de confirmação",
+    HET_OptPlaySound         = "Tocar som de confirmação",
+    HET_OptAllowVehicle      = "Permitir ativação dentro de veículos",
+    HET_OptRequireConfirm    = "Exigir confirmação antes de ativar",
+    HET_OptDebugLogs         = "Ativar logs de depuração",
+
+    HET_MsgActivated         = "EVENTO DE HELICÓPTERO ATIVADO",
+    HET_MsgRegion            = "Um helicóptero foi avistado na região.",
+    HET_MsgPrepare           = "Prepare-se para receber visitas.",
+    HET_MsgConfirmTitle      = "CONFIRMAR ATIVAÇÃO?",
+    HET_MsgConfirmBody       = "Pressione %1 novamente para confirmar.",
+    HET_MsgCooldown          = "Cooldown: %1 segundos restantes.",
+    HET_MsgVehicle           = "Não é possível ativar dentro de um veículo.",
+}
