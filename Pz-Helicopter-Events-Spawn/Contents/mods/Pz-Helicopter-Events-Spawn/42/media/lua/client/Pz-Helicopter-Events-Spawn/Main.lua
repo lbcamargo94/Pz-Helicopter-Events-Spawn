@@ -7,20 +7,13 @@
 require "Pz-Helicopter-Events-Spawn/Options"
 
 -- ============================================================
---  Estado global (acessivel por CooldownBar.lua)
+--  Estado global
 -- ============================================================
 
 HES_State = HES_State or {}
-HES_State.lastActivation = HES_State.lastActivation or 0
-HES_State.eventEndAt     = HES_State.eventEndAt     or 0
-HES_State.sessionCount   = HES_State.sessionCount   or 0
+HES_State.sessionCount   = HES_State.sessionCount or 0
 HES_State.pendingConfirm = false
 HES_State.pendingTime    = 0
--- Fire system state (reset on every load)
-HES_State.fireActive      = false
-HES_State.fireEndAt       = 0
-HES_State.lastFireBurst   = 0
-HES_State.fireFirstBurst  = false
 
 local CONFIRM_WINDOW = 5000
 
@@ -127,120 +120,6 @@ local function saveHistory(player, total, lastDay)
 end
 
 -- ============================================================
---  Rajada de fogo do helicoptero
--- ============================================================
-
-local function doFireBurst()
-    local player = getPlayer()
-    if not player or player:isDead() then return end
-
-    -- Dano no jogador (apenas ao ar livre)
-    if getOpt("fireHitsPlayer") then
-        local curSq  = player:getCurrentSquare()
-        local indoor = curSq ~= nil and curSq:getRoom() ~= nil
-        if not indoor then
-            local dmgPct = (getOpt("fireDamage") or 5) / 100.0
-            local newHp  = math.max(0.01, player:getHealth() - dmgPct)
-            player:setHealth(newHp)
-            dbg("fogo atingiu jogador: saude = " .. string.format("%.2f", newHp))
-        else
-            dbg("jogador em abrigo, dano ignorado")
-        end
-    end
-
-    -- Mata zumbis proximos aleatoriamente
-    -- Usa getObjectListForLua() + iteracao reversa (mesmo padrao de DebugContextMenu.lua:597)
-    if getOpt("fireHitsZombies") then
-        local cell = getCell()
-        if cell then
-            local px       = player:getX()
-            local py       = player:getY()
-            local radius   = 15
-            local radiusSq = radius * radius
-            local objects  = cell:getObjectListForLua()
-            local killed   = 0
-            if objects then
-                for i = objects:size(), 1, -1 do
-                    local obj = objects:get(i - 1)
-                    if obj and instanceof(obj, "IsoZombie") then
-                        local dx = obj:getX() - px
-                        local dy = obj:getY() - py
-                        if (dx * dx + dy * dy) <= radiusSq and math.random(1, 100) <= 40 then
-                            obj:removeFromWorld()
-                            obj:removeFromSquare()
-                            killed = killed + 1
-                        end
-                    end
-                end
-            end
-            dbg("fogo eliminou " .. killed .. " zumbi(s)")
-        end
-    end
-
-    -- Ruido de tiro para atrair zumbis (noise event do motor do jogo)
-    if addSound then
-        addSound(player, player:getX(), player:getY(), player:getZ(), 40, 1)
-    end
-
-    -- Som de disparo do helicoptero (2D / sem direcional para soar "do ceu")
-    -- AssaultShot = rajada unica | MetaAssaultRifle1 = meta-evento de multiplos tiros
-    local sm = getSoundManager and getSoundManager()
-    if sm then
-        -- alterna entre AssaultShot e MetaAssaultRifle1 para variedade
-        if math.random(1, 3) == 1 then
-            sm:playUISound("MetaAssaultRifle1")
-        else
-            sm:playUISound("AssaultShot")
-        end
-    end
-
-    -- Notificacao HUD apenas na primeira rajada
-    if HES_State.fireFirstBurst then
-        HES_State.fireFirstBurst = false
-        showHUDMsg({ HES_getText("HES_MsgFireHit") }, true)
-    end
-end
-
--- ============================================================
---  Encerramento do evento (automatico ou manual)
--- ============================================================
-
-local function doEndEvent(fromManual)
-    HES_State.eventEndAt  = 0
-    HES_State.fireActive  = false
-    HES_State.fireEndAt   = 0
-    pcall(endHelicopter)
-    if fromManual then
-        dbg("evento encerrado manualmente")
-    else
-        dbg("evento encerrado apos duracao configurada")
-    end
-    showHUDMsg({ HES_getText("HES_MsgEventEnded") }, true)
-end
-
-Events.OnTick.Add(function()
-    local now = getTimeInMillis()
-
-    -- Encerramento automatico do evento
-    if HES_State.eventEndAt ~= 0 and now >= HES_State.eventEndAt then
-        doEndEvent(false)
-    end
-
-    -- Rajadas de fogo
-    if not HES_State.fireActive then return end
-    if now >= HES_State.fireEndAt then
-        HES_State.fireActive = false
-        dbg("fogo do helicoptero encerrado")
-        return
-    end
-    local intervalMs = math.max(1000, (getOpt("fireBurstInterval") or 8) * 1000)
-    if (now - HES_State.lastFireBurst) >= intervalMs then
-        HES_State.lastFireBurst = now
-        doFireBurst()
-    end
-end)
-
--- ============================================================
 --  Logica principal de disparo
 -- ============================================================
 
@@ -265,31 +144,10 @@ local function doTrigger()
         end
     end
 
-    -- restricao de dias de jogo
-    local minDays = getOpt("minDaysBeforeUse") or 0
-    if minDays > 0 then
-        local currentDay = math.floor(getGameTime():getWorldAgeHours() / 24)
-        if currentDay < minDays then
-            dbg("bloqueado por dia: dia atual " .. currentDay .. " < minDays " .. minDays)
-            showHUDMsg({ HES_getText("HES_MsgDayBlocked", tostring(minDays)) }, true)
-            return
-        end
-    end
-
     -- restricao de veiculo
     if not getOpt("allowInVehicle") and player:getVehicle() ~= nil then
         dbg("dentro de veiculo, bloqueado")
         showHUDMsg({ HES_getText("HES_MsgVehicle") }, true)
-        return
-    end
-
-    -- cooldown
-    local now        = getTimeInMillis()
-    local cooldownMs = (getOpt("cooldownSecs") or 60) * 1000
-    if cooldownMs > 0 and (now - HES_State.lastActivation) < cooldownMs then
-        local remaining = math.ceil((cooldownMs - (now - HES_State.lastActivation)) / 1000)
-        dbg("cooldown ativo: " .. remaining .. "s")
-        showHUDMsg({ HES_getText("HES_MsgCooldown", tostring(remaining)) }, true)
         return
     end
 
@@ -300,6 +158,21 @@ local function doTrigger()
             dbg("chance falhou (" .. chance .. "%)")
             showHUDMsg({ HES_getText("HES_MsgChanceFail") }, true)
             return
+        end
+    end
+
+    -- Som de confirmacao ANTES de chamar o helicoptero
+    if getOpt("playSound") then
+        local sm = getSoundManager and getSoundManager()
+        if sm then
+            local x, y, z = player:getX(), player:getY(), player:getZ()
+            local handle = sm:PlayWorldSoundImpl("hes_solidcopy", false, x, y, z, 0, 9999, 1, false)
+            if not handle or handle == 0 then
+                sm:playUISound("UIActivateButton")
+                dbg("solidcopy: OGG nao carregado, usando UIActivateButton como fallback")
+            else
+                dbg("solidcopy: handle=" .. tostring(handle))
+            end
         end
     end
 
@@ -316,17 +189,7 @@ local function doTrigger()
     end
 
     -- atualiza estado
-    HES_State.lastActivation = now
-    HES_State.sessionCount   = HES_State.sessionCount + 1
-
-    -- agenda encerramento automatico
-    local minSecs = getOpt("minEventSecs") or 0
-    if minSecs > 0 then
-        HES_State.eventEndAt = now + minSecs * 1000
-        dbg("encerramento agendado em " .. minSecs .. "s")
-    else
-        HES_State.eventEndAt = 0
-    end
+    HES_State.sessionCount = HES_State.sessionCount + 1
 
     -- historico persistente
     local hist = loadHistory(player)
@@ -346,25 +209,6 @@ local function doTrigger()
         HES_getText("HES_MsgActivationCount", tostring(HES_State.sessionCount)),
     })
 
-    if getOpt("playSound") then
-        pcall(function()
-            local p = getPlayer()
-            if p then
-                p:getEmitter():playSound("VehicleSirenWall")
-            end
-        end)
-    end
-
-    -- Ativa modo de fogo se configurado
-    if getOpt("fireEnabled") then
-        local fireSecs = math.max(5, getOpt("fireDuration") or 30)
-        HES_State.fireActive     = true
-        HES_State.fireEndAt      = now + fireSecs * 1000
-        HES_State.lastFireBurst  = now  -- primeira rajada apos o primeiro intervalo
-        HES_State.fireFirstBurst = true
-        dbg("modo de fogo ativado por " .. fireSecs .. "s")
-    end
-
     dbg("evento ativado (sessao: " .. HES_State.sessionCount .. ")")
 end
 
@@ -380,22 +224,6 @@ Events.OnKeyPressed.Add(function(key)
     local options = PZAPI.ModOptions:getOptions("Pz-Helicopter-Events-Spawn")
     if not options then return end
 
-    -- tecla de encerramento manual
-    local endKeyOpt = options:getOption("endKey")
-    if endKeyOpt then
-        local endKeyVal = endKeyOpt:getValue()
-        if endKeyVal ~= nil and endKeyVal ~= 0 and key == endKeyVal then
-            if isClient() and not isServer() then
-                sendClientCommand(player, "Pz-Helicopter-Events-Spawn", "endHelicopter", {})
-                dbg("comando de encerramento enviado ao servidor (MP)")
-            else
-                doEndEvent(true)
-            end
-            return
-        end
-    end
-
-    -- tecla de ativacao
     local activKeyOpt = options:getOption("activationKey")
     if not activKeyOpt then return end
     if key ~= activKeyOpt:getValue() then return end

@@ -8,12 +8,8 @@ local function onClientCommand(module, command, player, args)
     if module ~= "Pz-Helicopter-Events-Spawn" then return end
 
     if command == "triggerHelicopter" then
-        print("[HET] servidor: triggerHelicopter solicitado por " .. tostring(player:getUsername()))
+        print("[HES] servidor: triggerHelicopter solicitado por " .. tostring(player:getUsername()))
         pcall(testHelicopter)
-
-    elseif command == "endHelicopter" then
-        print("[HET] servidor: endHelicopter solicitado por " .. tostring(player:getUsername()))
-        pcall(endHelicopter)
     end
 end
 
