@@ -27,7 +27,6 @@
     "HES_MsgActivated": "EVENTO DE HELICOPTERO ATIVADO",
     "HES_MsgRegion": "Um helicoptero foi avistado na regiao.",
     "HES_MsgPrepare": "Prepare-se para receber visitas.",
-    "HES_MsgEventActive": "Evento de helicoptero ja ativo!",
     "HES_MsgConfirmTitle": "CONFIRMAR ATIVACAO?",
     "HES_MsgConfirmBody": "Pressione %1 novamente para confirmar.",
     "HES_MsgVehicle": "Nao e possivel ativar dentro de um veiculo.",

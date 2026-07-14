@@ -14,11 +14,8 @@ HES_State = HES_State or {}
 HES_State.sessionCount   = HES_State.sessionCount or 0
 HES_State.pendingConfirm = false
 HES_State.pendingTime    = 0
-HES_State.cooldownUntil  = 0
 
 local CONFIRM_WINDOW  = 5000
--- Helicopter event lasts ~10-15 min; block re-trigger during that window
-local COOLDOWN_MS     = 15 * 60 * 1000
 
 -- ============================================================
 --  Helpers
@@ -137,15 +134,6 @@ local function doTrigger()
         return
     end
 
-    -- cooldown: previne duplicacao enquanto evento esta ativo
-    local now = getTimeInMillis()
-    if now < HES_State.cooldownUntil then
-        local remaining = math.ceil((HES_State.cooldownUntil - now) / 1000)
-        dbg("evento ja ativo, cooldown restante: " .. remaining .. "s")
-        showHUDMsg({ HES_getText("HES_MsgEventActive") }, true)
-        return
-    end
-
     -- sandbox
     if getOpt("respectSandbox") then
         local sv = SandboxVars
@@ -201,8 +189,7 @@ local function doTrigger()
     end
 
     -- atualiza estado
-    HES_State.sessionCount  = HES_State.sessionCount + 1
-    HES_State.cooldownUntil = getTimeInMillis() + COOLDOWN_MS
+    HES_State.sessionCount = HES_State.sessionCount + 1
 
     -- historico persistente
     local hist = loadHistory(player)
