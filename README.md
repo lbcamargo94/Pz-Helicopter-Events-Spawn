@@ -101,7 +101,4 @@ Pz-Helicopter-Events-Spawn/
 |---|---|
 | `v1.0.0` | Implementação inicial: tecla F7, disparo do evento vanilla |
 | `v1.1.0` | Funcionalidades avançadas: keybind configurável, chance, confirmação, som, bloqueio em veículo, sistema de tradução JSON |
-| `v1.2.0` | Remoção do sistema de fogo simulado e CooldownBar; mod simplificado e focado |
-| `v1.2.1` | Anti-duplicação: cooldown de 15 min em tempo real; corrigido nome do arquivo OGG do som |
-| `v1.2.2` | Removido cooldown anti-duplicação; README reescrito com documentação completa |
-| `v1.2.3` | Correções de documentação: referências ao cooldown removidas, histórico atualizado |
+| `v1.0.0-alpha` | Primeiro lançamento público: keybind F7, chance configurável, confirmação, som de rádio militar, suporte SP e MP, respeitar sandbox |
