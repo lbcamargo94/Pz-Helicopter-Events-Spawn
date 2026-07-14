@@ -1,6 +1,6 @@
 name=Pz-Helicopter-Events-Spawn
 id=Pz-Helicopter-Events-Spawn
 description=Pressione F7 (configuravel) para disparar o evento de helicoptero vanilla. Suporte a SP e MP, chance aleatoria, confirmacao por duplo clique e mais. Configure em Opcoes > Mods.
-modversion=1.2.2
+modversion=1.2.3
 pzversion=42
 poster=poster.png

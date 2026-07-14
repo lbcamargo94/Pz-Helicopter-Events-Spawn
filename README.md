@@ -104,3 +104,4 @@ Pz-Helicopter-Events-Spawn/
 | `v1.2.0` | Remoção do sistema de fogo simulado e CooldownBar; mod simplificado e focado |
 | `v1.2.1` | Anti-duplicação: cooldown de 15 min em tempo real; corrigido nome do arquivo OGG do som |
 | `v1.2.2` | Removido cooldown anti-duplicação; README reescrito com documentação completa |
+| `v1.2.3` | Correções de documentação: referências ao cooldown removidas, histórico atualizado |
