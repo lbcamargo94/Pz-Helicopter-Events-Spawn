@@ -16,8 +16,8 @@ Events.OnLoadSoundBanks.Add(function()
     local ok, e = pcall(function()
         sb:addSound(
             "hes_solidcopy",
-            "media/sound/solid-copy-continue-over-military-radio-voice-vadi-sound.ogg",
-            1.0, 0, 9999, 9999, 0, 1, false
+            "media/sound/military-radio-sound.ogg",
+            1.0, 0.001, 9999, 9999, 0, 1, false
         )
     end)
 
